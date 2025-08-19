@@ -64,6 +64,9 @@ dependencies {
   // SplashScreen compat library
   implementation 'androidx.core:core-splashscreen:1.0.1'
 
-  // TUTORIAL DEPENDENCIES HERE
+  // TUTORIAL DEPENDENCIES
+  // 1: Document Scanning
   implementation 'com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1'
+  // 2: Text Recognition
+  implementation 'com.google.mlkit:text-recognition:16.0.1'
 }
