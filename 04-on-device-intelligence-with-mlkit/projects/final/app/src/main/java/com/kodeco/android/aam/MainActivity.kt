@@ -1,6 +1,7 @@
 package com.kodeco.android.aam
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,8 +15,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,27 +29,29 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import com.kodeco.android.aam.ui.theme.KodecoSampleTheme
 import com.kodeco.android.aam.ui.theme.Shapes
+import com.kodeco.android.aam.ui.theme.carouselPadding
 
 class MainActivity : ComponentActivity() {
 
@@ -59,7 +62,7 @@ class MainActivity : ComponentActivity() {
   ) { result ->
     if (result.resultCode == RESULT_OK) {
       val scanResult = GmsDocumentScanningResult.fromActivityResultIntent(result.data)
-      viewModel.extractTextFromResult(scanResult = scanResult)
+      viewModel.extractPages(scanResult = scanResult)
     }
   }
 
@@ -68,85 +71,97 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
 
     setContent {
-      val context = LocalContext.current
-      val activity = context as? Activity
-      val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-      val carouselPadding = 16.dp
-
-      KodecoSampleTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-          Box(modifier = Modifier.fillMaxSize()) {
-            PageCarousel(
-              viewModel = viewModel,
-              screenWidth = screenWidth,
-              carouselPadding = carouselPadding
-            )
-            ScanButton(
-              viewModel = viewModel,
-              scannerLauncher = scannerLauncher,
-              activity = activity
-            )
-          }
-        }
-      }
+      MainScreen(viewModel = viewModel)
     }
   }
 
   @Composable
   fun BoxScope.PageCarousel(
     viewModel: MainViewModel,
-    screenWidth: androidx.compose.ui.unit.Dp,
-    carouselPadding: androidx.compose.ui.unit.Dp,
-    pageHeight: androidx.compose.ui.unit.Dp = 500.dp // Default page height
   ) {
+    val pageHeight = 500.dp
+    val pageWidth = LocalConfiguration.current.screenWidthDp.dp * 0.80F
+    val shape = Shapes.large as RoundedCornerShape
+
     LazyRow(
       modifier = Modifier
         .fillMaxWidth()
         .height(pageHeight)
         .align(Alignment.Center),
-      contentPadding = PaddingValues(
-        horizontal = carouselPadding,
-        vertical = carouselPadding
-      ), // For peeking effect
-      horizontalArrangement = Arrangement.spacedBy(carouselPadding) // Space between items
+      contentPadding = PaddingValues(horizontal = carouselPadding, vertical = carouselPadding),
+      horizontalArrangement = Arrangement.spacedBy(carouselPadding)
     ) {
-      val roundedCornerShape = Shapes.large as RoundedCornerShape
-      items(viewModel.recognizedImages) { uri ->
-        Column(horizontalAlignment = CenterHorizontally) {
-          Box( // Item wrapper for styling
-            modifier = Modifier
-              .width(screenWidth * 0.80F)
-              .height(400.dp) // Adjusted height to make space for the button
-              .background(Color.LightGray, roundedCornerShape)
-              .border(BorderStroke(2.dp, Color.Gray), roundedCornerShape)
-              .clip(roundedCornerShape)
-          ) {
-            AsyncImage(
-              model = uri,
-              contentDescription = "Scanned Document Page",
-              modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(16.dp)), // Match item shape
-              contentScale = ContentScale.Fit // Match item shape
-            )
+      items(viewModel.pageUris) { uri ->
+        PageItem(
+          uri = uri,
+          itemWidth = pageWidth,
+          itemShape = shape,
+        )
+      }
+    }
+  }
+
+  @Composable
+  fun PageItem(
+    uri: android.net.Uri,
+    itemWidth: Dp,
+    itemShape: RoundedCornerShape,
+  ) {
+    Box(
+      modifier = Modifier
+        .width(itemWidth)
+        .fillMaxHeight()
+        .background(Color.DarkGray, itemShape)
+        .border(BorderStroke(2.dp, Color.Gray), itemShape)
+        .clip(itemShape)
+    ) {
+      val context = LocalContext.current
+
+      // Image
+      AsyncImage(
+        model = uri,
+        contentDescription = "Scanned Document Page",
+        modifier = Modifier
+          .fillMaxSize()
+          .clip(RoundedCornerShape(16.dp)),
+        contentScale = ContentScale.Fit
+      )
+      // Button
+      Button(
+        onClick = {
+          viewModel.getTextFromImage(uri) { extractedText ->
+            extractedText?.let {
+              val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(
+                  Intent.EXTRA_TEXT,
+                  it
+                )
+                type = "text/plain"
+              }
+              val shareIntent = Intent.createChooser(sendIntent, "Text from Image")
+              context.startActivity(shareIntent)
+            }
           }
-          Button(
-            onClick = { /* TODO: Implement text extraction logic */ },
-            modifier = Modifier
-              .padding(top = 8.dp)
-              .height(100.dp)
-          ) {
-            Icon(
-              painter = painterResource(id = android.R.drawable.ic_menu_search), // Replace with your desired icon
-              contentDescription = "Extract Text Icon",
-              modifier = Modifier.size(24.dp)
-            )
-            Text(
-              text = "Extract Text",
-              modifier = Modifier.padding(start = 8.dp)
-            )
-          }
-        }
+        },
+        modifier = Modifier.align(Alignment.TopEnd),
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+        elevation = ButtonDefaults.elevation(
+          defaultElevation = 0.dp,
+          pressedElevation = 0.dp,
+          hoveredElevation = 0.dp,
+          focusedElevation = 0.dp
+        )
+      ) {
+        Text(text = "Extract Text", color = Color.White)
+        Icon(
+          imageVector = Icons.Filled.AutoAwesome,
+          contentDescription = "Extract Text Icon",
+          modifier = Modifier
+            .size(32.dp)
+            .padding(horizontal = 8.dp),
+          tint = Color.White
+        )
       }
     }
   }
@@ -154,18 +169,18 @@ class MainActivity : ComponentActivity() {
   @Composable
   fun BoxScope.ScanButton(
     viewModel: MainViewModel,
-    scannerLauncher: androidx.activity.result.ActivityResultLauncher<IntentSenderRequest>,
-    activity: Activity?
   ) {
-    // Camera button at the bottom center
+    val context = LocalContext.current
+    val activity = context as? Activity
+
     Box(
       modifier = Modifier
-        .align(Alignment.BottomCenter) // Align to bottom center of the parent Box
-        .padding(bottom = 32.dp) // Padding from the bottom edge
-        .size(64.dp) // Set a fixed size for the circular button
-        .clip(CircleShape) // Clip to a circle
-        .background(MaterialTheme.colors.primary) // Background color
-        .clickable { // Click listener on the Box
+        .align(Alignment.BottomCenter)
+        .padding(bottom = 32.dp)
+        .size(64.dp)
+        .clip(CircleShape)
+        .background(MaterialTheme.colors.primary)
+        .clickable {
           activity?.let {
             viewModel
               .prepareScanner()
@@ -178,11 +193,23 @@ class MainActivity : ComponentActivity() {
         .wrapContentSize(Alignment.Center) // Center the Icon within this Box
     ) {
       Icon(
-        Icons.Filled.AutoAwesome,
+        imageVector = Icons.Filled.DocumentScanner,
         contentDescription = "Scan Document",
         tint = Color.White
       )
     }
   }
-}
 
+  @Composable
+  fun MainScreen(viewModel: MainViewModel) {
+    KodecoSampleTheme {
+      Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+        Box(modifier = Modifier.fillMaxSize()) {
+          PageCarousel(viewModel = viewModel)
+          ScanButton(viewModel = viewModel)
+        }
+      }
+    }
+  }
+
+}
