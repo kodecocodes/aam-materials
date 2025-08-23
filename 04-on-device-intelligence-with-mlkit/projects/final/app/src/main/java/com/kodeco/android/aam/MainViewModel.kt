@@ -1,9 +1,13 @@
 package com.kodeco.android.aam
 
 import android.app.Application
+import androidx.compose.runtime.mutableStateListOf
+import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
+import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.common.InputImage.fromFilePath
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
@@ -14,6 +18,8 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 /**
@@ -25,10 +31,13 @@ import java.io.IOException
  */
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+  // State to hold the recognized images
+  val recognizedImages = mutableStateListOf<Uri>()
+
   // 1: Prepare Document Scanning Client
   fun prepareScanner(): GmsDocumentScanner {
     val options = GmsDocumentScannerOptions.Builder()
-      .setPageLimit(1)
+      .setPageLimit(3)
       .setResultFormats(RESULT_FORMAT_JPEG)
       .setScannerMode(SCANNER_MODE_FULL)
       .build()
@@ -36,16 +45,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   fun extractTextFromResult(scanResult: GmsDocumentScanningResult?) {
-    scanResult?.pages?.let { pages ->
-      for (page in pages) {
-        Log.d("scannerLauncher", "Selected page URI: $page")
-        try {
-          val image = fromFilePath(application, page.imageUri)
-          applyTextRecognition(image) { extractedText ->
-            Log.d("scannerLauncher", "Extracted text: $extractedText")
+    viewModelScope.launch(Dispatchers.IO) {
+      scanResult?.pages?.let { pages ->
+        for (page in pages) {
+          Log.d("scannerLauncher", "Selected page URI: $page")
+          try {
+            recognizedImages.add(page.imageUri)
+            val image = fromFilePath(application, page.imageUri)
+            applyTextRecognition(image) { extractedText ->
+              Log.d("scannerLauncher", "Extracted text: $extractedText")
+            }
+          } catch (e: IOException) {
+            Log.e("scannerLauncher", "ERROR: ${e.printStackTrace()}")
           }
-        } catch (e: IOException) {
-          Log.e("scannerLauncher", "ERROR: ${e.printStackTrace()}")
         }
       }
     }
