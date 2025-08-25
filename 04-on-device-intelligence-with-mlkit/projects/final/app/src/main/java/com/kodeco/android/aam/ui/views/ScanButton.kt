@@ -29,11 +29,11 @@ fun BoxScope.ScanButton(
       .padding(bottom = 32.dp)
       .size(64.dp)
       .clip(CircleShape)
-      .background(MaterialTheme.colors.primary)
+      .background(MaterialTheme.colors.secondary)
+      .wrapContentSize(Alignment.Companion.Center)
       .clickable {
         onClickScan.invoke()
       }
-      .wrapContentSize(Alignment.Companion.Center)
   ) {
     Icon(
       imageVector = Icons.Filled.DocumentScanner,
