@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() {
 
   private val viewModel: MainViewModel by viewModels()
 
+  // 1.2: Launcher Document intent Scanner and handling the result
   val scannerLauncher = registerForActivityResult(
     contract = ActivityResultContracts.StartIntentSenderForResult()
   ) { result ->
@@ -45,11 +46,13 @@ class MainActivity : ComponentActivity() {
             PageCarousel(
               pages = viewModel.pageUris,
               onItemClick = { uri ->
+                // 2.4: Text Recognition and share on item click
                 shareTextFromImage(uri = uri)
               }
             )
             ScanButton(
               onClickScan = {
+                // 1.5: Launch Document Scanner on button click
                 launchDocumentScanner()
               }
             )
@@ -59,15 +62,18 @@ class MainActivity : ComponentActivity() {
     }
   }
 
+  // 1.4: Launch Document Scanner
   private fun launchDocumentScanner() {
     viewModel
       .prepareScanner()
       .getStartScanIntent(this@MainActivity)
-      .addOnSuccessListener { intentSender ->
-        scannerLauncher.launch(IntentSenderRequest.Builder(intentSender).build())
+      .addOnSuccessListener { it ->
+        val scannerIntent = IntentSenderRequest.Builder(it).build()
+        scannerLauncher.launch(scannerIntent)
       }
   }
 
+  // 2.2: Extract text from image, and then share with the Share Intent
   private fun shareTextFromImage(uri: Uri) {
     viewModel.getTextFromImage(uri) { extractedText ->
       extractedText?.let {
@@ -76,6 +82,7 @@ class MainActivity : ComponentActivity() {
     }
   }
 
+  // 2.3: Using Share Intent
   private fun shareText(text: String) {
     val intent = Intent().apply {
       action = Intent.ACTION_SEND

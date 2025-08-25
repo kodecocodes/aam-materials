@@ -2,7 +2,6 @@ package com.kodeco.android.aam
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
@@ -24,7 +23,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
   // State to hold the recognized images
   val pageUris = mutableStateListOf<Uri>()
 
-  // 1: Prepare Document Scanning Client
+  // 1.1: Prepare Document Scanning Client
   fun prepareScanner(): GmsDocumentScanner {
     val options = GmsDocumentScannerOptions.Builder()
       .setPageLimit(3)
@@ -34,10 +33,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     return GmsDocumentScanning.getClient(options)
   }
 
+  // 1.3: Extract the pages from the result
   fun extractPages(scanResult: GmsDocumentScanningResult?) {
     viewModelScope.launch(Dispatchers.IO) {
       scanResult?.pages?.let { pages ->
         pageUris.clear()
+
         for (page in pages) {
           pageUris.add(page.imageUri)
         }
@@ -45,6 +46,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
+  // 2.1: Extract text from image
   fun getTextFromImage(image: Uri, onCompleted: (String?) -> Unit) {
     viewModelScope.launch(Dispatchers.IO) {
       val image = fromFilePath(application, image)
@@ -52,11 +54,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         .process(image)
         .addOnSuccessListener { visionText ->
           val resultText = visionText.text
-          Log.d("scannerLauncher", "Extracted text: $resultText")
           onCompleted(resultText)
         }
         .addOnFailureListener { e ->
-          Log.e("scannerLauncher", "Extracted text ERROR: ${e.printStackTrace()}")
           onCompleted(null)
         }
     }
