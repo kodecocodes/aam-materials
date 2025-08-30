@@ -1,0 +1,10 @@
+<resources>
+  <string name="app_name">Kodeco Sample</string>
+  <string name="scanned_document_page_description">Scanned Document Page</string>
+  <string name="placeholder_extracted_text">Placeholder extracted text for image: %1$s</string>
+  <string name="share_intent_mime_type">text/plain</string>
+  <string name="share_extracted_text_title">Share Extracted Text</string>
+  <string name="extract_text_button">Extract Text</string>
+  <string name="extract_text_icon_description">Extract Text Icon</string>
+  <string name="scan_document_button_description">Scan Document</string>
+</resources>
