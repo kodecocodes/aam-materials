@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "309534000318",
+    "project_id": "kodeco-aiml-book",
+    "storage_bucket": "kodeco-aiml-book.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309534000318:android:3e3303946094731271caef",
+        "android_client_info": {
+          "package_name": "com.kodeco.android.aiml"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcfukD5QNVdj52H8Wgpuq4jUjLdsM3X48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
