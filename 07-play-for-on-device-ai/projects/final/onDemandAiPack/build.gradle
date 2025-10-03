@@ -1,0 +1,10 @@
+plugins {
+  id 'com.android.ai-pack'
+}
+
+aiPack {
+  packName = "onDemandAiPack"
+  dynamicDelivery {
+    deliveryType = "on-demand"
+  }
+}
