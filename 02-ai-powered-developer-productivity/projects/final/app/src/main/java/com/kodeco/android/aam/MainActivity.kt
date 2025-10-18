@@ -1,41 +1,44 @@
 package com.kodeco.android.aam
 
 import android.os.Bundle
-import android.widget.Toast // Added
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels // Added
-import androidx.compose.foundation.clickable // Added
+import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding // Added
-import androidx.compose.foundation.lazy.LazyColumn // Added
-import androidx.compose.foundation.lazy.items // Added
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState // Added
-import androidx.compose.runtime.getValue // Added
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext // Added
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp // Added
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kodeco.android.aam.ui.theme.KodecoSampleTheme
 
-/**
- * MainActivity is the main entry point of the application.
- * It uses Jetpack Compose to display a list of cat breeds.
- * The cat breeds data is fetched from a MainViewModel.
- *
- * This activity sets up the UI, observes the cat breeds from the ViewModel,
- * and displays them in a CatBreedsListScreen.
- * When a cat breed item is clicked, a Toast message with the breed name is shown.
- */
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainViewModel by viewModels() // Added ViewModel
-
-    // popularCatBreeds list is now removed from here
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -43,7 +46,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             KodecoSampleTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
                     val catBreeds by viewModel.catBreeds.collectAsState()
                     val context = LocalContext.current
                     CatBreedsListScreen(
@@ -64,28 +70,50 @@ fun CatBreedsListScreen(breeds: List<String>, onItemClick: (String) -> Unit) {
         Text(text = "No cat breeds available.", modifier = Modifier.padding(16.dp))
         return
     }
-    LazyColumn(modifier = Modifier.padding(8.dp)) {
+    LazyColumn(
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
         items(breeds) { breed ->
-            Text(
-                text = breed,
+            Card(
                 modifier = Modifier
-                    .fillParentMaxWidth()
-                    .clickable { onItemClick(breed) }
-                    .padding(vertical = 12.dp, horizontal = 16.dp)
-            )
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp, horizontal = 8.dp)
+                    .clickable { onItemClick(breed) },
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = breed,
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black
+                        )
+                    )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Go to details",
+                        modifier = Modifier.height(16.dp)
+                    )
+                }
+            }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun CatBreedsListScreenPreview() {
-    val breeds = listOf("Abyssinian", "Aegean", "American Bobtail", "American Curl")
-    CatBreedsListScreen(breeds = breeds, onItemClick = {})
+    KodecoSampleTheme {
+        CatBreedsListScreen(
+            breeds = listOf("Abyssinian", "Aegean", "American Bobtail"),
+            onItemClick = {}
+        )
+    }
 }
-
-// Greeting composable is removed
-
-
-
-
