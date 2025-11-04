@@ -32,15 +32,10 @@ package com.kodeco.android.aam
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Firebase
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerativeBackend
-import com.google.firebase.ai.type.PublicPreviewAPI
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-@OptIn(PublicPreviewAPI::class)
 class MainViewModel : ViewModel() {
 
   private val _catBreeds = MutableStateFlow<List<String>>(emptyList())
