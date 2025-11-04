@@ -71,5 +71,4 @@ dependencies {
   implementation "com.halilibo.compose-richtext:richtext-commonmark:$richTextVersion"
 
   // Firebase AI Logic
-  implementation "com.google.firebase:firebase-ai:17.2.0"
 }
