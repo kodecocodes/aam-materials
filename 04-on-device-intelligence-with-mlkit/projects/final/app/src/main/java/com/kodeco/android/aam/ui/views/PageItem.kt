@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.kodeco.android.aam.ui.theme.colorAccent
 
 @Composable
 fun PageItem(
@@ -65,14 +66,14 @@ fun PageItem(
         focusedElevation = 0.dp
       )
     ) {
-      Text(text = "Extract Text", color = Color.Companion.White)
+      Text(text = "Extract Text", color = colorAccent)
       Icon(
         imageVector = Icons.Filled.AutoAwesome,
         contentDescription = "Extract Text Icon",
         modifier = Modifier
           .size(32.dp)
           .padding(horizontal = 8.dp),
-        tint = Color.Companion.White
+        tint = colorAccent
       )
     }
   }
