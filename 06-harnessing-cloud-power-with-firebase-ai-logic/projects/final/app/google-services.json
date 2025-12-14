@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "42739076950",
+    "project_id": "kodecokats-firebaseai-209c8",
+    "storage_bucket": "kodecokats-firebaseai-209c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42739076950:android:c87d208ede7ea7aa2190f7",
+        "android_client_info": {
+          "package_name": "com.kodeco.android.aiml"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWqynxnb7KOdoISN7BFPDwr7WyKPDkf2g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
