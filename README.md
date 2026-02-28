@@ -1,6 +1,6 @@
-# Android AI & ML: Materials
+# Practical Android AI: Materials
 
-This repo contains all the downloadable materials and projects associated with the **[Android AI & ML](https://www.kodeco.com/books)** from [Kodeco](https://www.kodeco.com).
+This repo contains all the downloadable materials and projects associated with the **[Practical Android AI](https://www.kodeco.com/books/practical-android-ai)** from [Kodeco](https://www.kodeco.com).
 
 Each edition has its own branch, named `editions/[EDITION]`. The default branch for this repo is for the most recent edition.
 
@@ -12,5 +12,5 @@ We’ve set up an official forum for the book at [https://forums.kodeco.com/c/bo
 
 | Branch                                                                            | Edition | Release Date |
 | --------------------------------------------------------------------------------- |:-------:|:------------:|
-| [editions/1.0](https://github.com/kodecocodes/aam-materials/tree/editions/1.0) | 1.0     | YYYY-MM-DD   |
+| [editions/1.0](https://github.com/kodecocodes/aam-materials/tree/editions/1.0) | 1.0     | 2026-02-28   |
 
